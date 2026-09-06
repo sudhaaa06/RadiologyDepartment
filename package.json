@@ -1,0 +1,12 @@
+{
+  "name": "prior-study-matching-assistant",
+  "version": "1.0.0",
+  "description": "Prior-Study Matching Assistant for Radiology — Phase 1 Prototype",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "preview": "npm run preview --prefix frontend"
+  }
+}
+
