@@ -109,8 +109,79 @@ LATERALITIES = ["Right", "Left", "Bilateral", "N/A"]
 def build_explicit_journeys():
     journeys = []
 
-    # JOURNEY 1 — STAT CT Brain
-    # Query: STAT CT Brain (Current)
+    # DEMO SCENARIO 1 — External Centre CT Thorax Normalization
+    # Query: Main PACS CT Chest
+    st_demo1_q = {
+        "study_id": "ST_DEMO1_CHEST_QUERY",
+        "patient_id_hash": "PAT_DEMO_CHEST",
+        "study_date": "2026-08-25",
+        "urgency": "ROUTINE",
+        "department": "Pulmonology",
+        "source_centre": "Hospital A",
+        "modality": "CT",
+        "body_region": "Chest",
+        "anatomy": "Lung",
+        "laterality": "N/A",
+        "clinical_indication": "Follow-up pulmonary nodule RUL",
+        "condition_concept": "Pulmonary Nodule",
+        "report_summary": "7mm subpleural right upper lobe nodule, surveillance requested",
+        "report_concepts": ["RUL nodule", "subpleural", "nodule surveillance"],
+        "exam_type": "CT Chest Without Contrast",
+        "contrast_used": False,
+        "comparison_available": True,
+        "prior_study_ids": ["ST_DEMO1_EXT_PRIOR"],
+        "is_clinically_relevant_prior": False
+    }
+
+    # Prior from External Centre using non-standard term "CT Thorax"
+    st_demo1_p1 = {
+        "study_id": "ST_DEMO1_EXT_PRIOR",
+        "patient_id_hash": "PAT_DEMO_CHEST",
+        "study_date": "2025-06-12",
+        "urgency": "ROUTINE",
+        "department": "Pulmonology",
+        "source_centre": "External Centre",
+        "modality": "CAT Scan",
+        "body_region": "CT Thorax",
+        "anatomy": "Lung",
+        "laterality": "N/A",
+        "clinical_indication": "Solitary pulmonary nodule RUL surveillance",
+        "condition_concept": "Pulmonary Nodule",
+        "report_summary": "Prior 6.5mm right upper lobe pulmonary nodule documented at external facility",
+        "report_concepts": ["RUL nodule", "subpleural", "nodule surveillance"],
+        "exam_type": "CT Thorax Non-Contrast",
+        "contrast_used": False,
+        "comparison_available": True,
+        "prior_study_ids": [],
+        "is_clinically_relevant_prior": True
+    }
+
+    # Noise prior: CXR 3 months ago with pneumonia
+    st_demo1_p2 = {
+        "study_id": "ST_DEMO1_NOISE_PRIOR",
+        "patient_id_hash": "PAT_DEMO_CHEST",
+        "study_date": "2026-05-10",
+        "urgency": "ROUTINE",
+        "department": "Internal Med",
+        "source_centre": "Hospital B",
+        "modality": "CXR",
+        "body_region": "Chest",
+        "anatomy": "Lung",
+        "laterality": "N/A",
+        "clinical_indication": "Cough and fever, rule out pneumonia",
+        "condition_concept": "General Exam",
+        "report_summary": "Mild bilateral lower lobe infiltrate, resolved",
+        "report_concepts": ["pneumonia", "infiltrate"],
+        "exam_type": "Chest Radiograph PA/LAT",
+        "contrast_used": False,
+        "comparison_available": True,
+        "prior_study_ids": [],
+        "is_clinically_relevant_prior": False
+    }
+
+    journeys.extend([st_demo1_q, st_demo1_p1, st_demo1_p2])
+
+    # DEMO SCENARIO 2 — STAT CT Brain
     st_stat_q = {
         "study_id": "ST_JOURNEY1_STAT",
         "patient_id_hash": "PAT_STAT_BRAIN",
@@ -119,9 +190,7 @@ def build_explicit_journeys():
         "department": "Emergency",
         "source_centre": "Main PACS",
         "modality": "CT",
-        "modality_canonical": "CT",
         "body_region": "Brain",
-        "body_region_canonical": "Brain",
         "anatomy": "Brain Hemisphere",
         "laterality": "N/A",
         "clinical_indication": "STAT rule out acute stroke evolution",
@@ -135,7 +204,6 @@ def build_explicit_journeys():
         "is_clinically_relevant_prior": False
     }
 
-    # Best Relevant Prior CT Brain (8 months ago)
     st_stat_p1 = {
         "study_id": "ST_JOURNEY1_PRIOR_BEST",
         "patient_id_hash": "PAT_STAT_BRAIN",
@@ -144,9 +212,7 @@ def build_explicit_journeys():
         "department": "Neurology",
         "source_centre": "Main PACS",
         "modality": "CT",
-        "modality_canonical": "CT",
         "body_region": "Brain",
-        "body_region_canonical": "Brain",
         "anatomy": "Brain Hemisphere",
         "laterality": "N/A",
         "clinical_indication": "Acute MCA stroke follow-up",
@@ -160,18 +226,15 @@ def build_explicit_journeys():
         "is_clinically_relevant_prior": True
     }
 
-    # Recent but less relevant scan (Chest CT for Trauma, 1 month ago)
     st_stat_p2 = {
         "study_id": "ST_JOURNEY1_PRIOR_RECENT_NOISE",
         "patient_id_hash": "PAT_STAT_BRAIN",
-        "study_date": "2026-07-01", # More recent, but wrong anatomy/condition!
+        "study_date": "2026-07-01",
         "urgency": "ROUTINE",
         "department": "Emergency",
         "source_centre": "Main PACS",
         "modality": "CT",
-        "modality_canonical": "CT",
         "body_region": "Chest",
-        "body_region_canonical": "Chest",
         "anatomy": "Lung",
         "laterality": "N/A",
         "clinical_indication": "Trauma chest pain post MVC",
@@ -187,8 +250,7 @@ def build_explicit_journeys():
 
     journeys.extend([st_stat_q, st_stat_p1, st_stat_p2])
 
-    # JOURNEY 2 — ROUTINE MRI Knee
-    # Query: ROUTINE MRI Knee (Current)
+    # DEMO SCENARIO 3 — ROUTINE MRI Knee Override
     st_routine_q = {
         "study_id": "ST_JOURNEY2_ROUTINE",
         "patient_id_hash": "PAT_ROUTINE_KNEE",
@@ -197,9 +259,7 @@ def build_explicit_journeys():
         "department": "Orthopedics",
         "source_centre": "Metro Outpatient Imaging",
         "modality": "MRI",
-        "modality_canonical": "MRI",
         "body_region": "Knee",
-        "body_region_canonical": "Knee",
         "anatomy": "Knee Joint",
         "laterality": "Right",
         "clinical_indication": "Persistent right knee pain, rule out meniscal re-tear",
@@ -213,7 +273,6 @@ def build_explicit_journeys():
         "is_clinically_relevant_prior": False
     }
 
-    # Assistant Top Rank Pick (X-Ray Knee, 2 months ago)
     st_routine_p1 = {
         "study_id": "ST_JOURNEY2_PRIOR_ASSISTANT_PICK",
         "patient_id_hash": "PAT_ROUTINE_KNEE",
@@ -222,9 +281,7 @@ def build_explicit_journeys():
         "department": "Orthopedics",
         "source_centre": "Metro Outpatient Imaging",
         "modality": "X-Ray",
-        "modality_canonical": "X-Ray",
         "body_region": "Knee",
-        "body_region_canonical": "Knee",
         "anatomy": "Knee Joint",
         "laterality": "Right",
         "clinical_indication": "Right knee plain radiograph",
@@ -238,7 +295,6 @@ def build_explicit_journeys():
         "is_clinically_relevant_prior": False
     }
 
-    # Human-Selected Target Prior (Prior Post-op MRI Knee, 1 year ago)
     st_routine_p2 = {
         "study_id": "ST_JOURNEY2_PRIOR_HUMAN_PICK",
         "patient_id_hash": "PAT_ROUTINE_KNEE",
@@ -247,9 +303,7 @@ def build_explicit_journeys():
         "department": "Orthopedics",
         "source_centre": "Main PACS",
         "modality": "MRI",
-        "modality_canonical": "MRI",
         "body_region": "Knee",
-        "body_region_canonical": "Knee",
         "anatomy": "Knee Joint",
         "laterality": "Right",
         "clinical_indication": "Post-op baseline MRI right knee",
@@ -265,9 +319,81 @@ def build_explicit_journeys():
 
     journeys.extend([st_routine_q, st_routine_p1, st_routine_p2])
 
+    # DEMO SCENARIO 4 — FEATURE 8: No-Prior State
+    st_no_prior_q = {
+        "study_id": "ST_DEMO_NO_PRIOR",
+        "patient_id_hash": "PAT_NO_PRIOR_001",
+        "study_date": "2026-08-28",
+        "urgency": "ROUTINE",
+        "department": "Gastroenterology",
+        "source_centre": "Hospital A",
+        "modality": "CT",
+        "body_region": "Abdomen",
+        "anatomy": "Liver",
+        "laterality": "N/A",
+        "clinical_indication": "Initial workup for elevated LFTs, new patient",
+        "condition_concept": "Liver Lesion",
+        "report_summary": "Initial baseline imaging, no historical records on file",
+        "report_concepts": ["baseline", "elevated LFTs"],
+        "exam_type": "CT Abdomen With Contrast",
+        "contrast_used": True,
+        "comparison_available": False,
+        "prior_study_ids": [],
+        "is_clinically_relevant_prior": False
+    }
+
+    # DEMO SCENARIO 5 — FEATURE 8: Low-Evidence State (<60 Score)
+    st_low_ev_q = {
+        "study_id": "ST_DEMO_LOW_EVIDENCE",
+        "patient_id_hash": "PAT_LOW_EVIDENCE_002",
+        "study_date": "2026-08-29",
+        "urgency": "ROUTINE",
+        "department": "Pulmonology",
+        "source_centre": "Main PACS",
+        "modality": "CT",
+        "body_region": "Chest",
+        "anatomy": "Lung",
+        "laterality": "N/A",
+        "clinical_indication": "Suspected pulmonary nodule",
+        "condition_concept": "Pulmonary Nodule",
+        "report_summary": "High resolution chest CT for indeterminate lesion",
+        "report_concepts": ["lung lesion"],
+        "exam_type": "CT Chest Without Contrast",
+        "contrast_used": False,
+        "comparison_available": False,
+        "prior_study_ids": [],
+        "is_clinically_relevant_prior": False
+    }
+
+    # Disparate prior: Ultrasound of Pelvis from 3 years ago
+    st_low_ev_p1 = {
+        "study_id": "ST_DEMO_LOW_EV_PRIOR",
+        "patient_id_hash": "PAT_LOW_EVIDENCE_002",
+        "study_date": "2023-03-15",
+        "urgency": "ROUTINE",
+        "department": "Gastroenterology",
+        "source_centre": "Regional General Hospital",
+        "modality": "Ultrasound",
+        "body_region": "Pelvis",
+        "anatomy": "Pelvis",
+        "laterality": "N/A",
+        "clinical_indication": "Pelvic pain workup",
+        "condition_concept": "General Exam",
+        "report_summary": "Normal pelvic ultrasound 3 years prior",
+        "report_concepts": ["normal"],
+        "exam_type": "Ultrasound Pelvis",
+        "contrast_used": False,
+        "comparison_available": False,
+        "prior_study_ids": [],
+        "is_clinically_relevant_prior": False
+    }
+
+    journeys.extend([st_no_prior_q, st_low_ev_q, st_low_ev_p1])
+
     return journeys
 
-def generate_dataset(num_patients=35, studies_per_patient_range=(4, 6)):
+
+def generate_dataset(num_patients=55, studies_per_patient_range=(4, 6)):
     studies = []
     study_counter = 1000
 

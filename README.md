@@ -1,10 +1,10 @@
 # Prior-Study Matching Assistant for Radiology
 
 [![Phase 1 & 2 Prototype](https://img.shields.io/badge/Project%20Status-100%25%20Complete-brightgreen.svg)](#)
-[![Python 3.11](https://img.shields.io/badge/Python-3.11-blue.svg)](#)
+[![Python 3.13](https://img.shields.io/badge/Python-3.13-blue.svg)](#)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg)](#)
 [![React](https://img.shields.io/badge/React-18-61DAFB.svg)](#)
-[![Tests Passed](https://img.shields.io/badge/Pytest-33%2F33%20Passed-success.svg)](#)
+[![Tests Passed](https://img.shields.io/badge/Pytest-42%2F42%20Passed-success.svg)](#)
 
 A decision-support system designed to reduce radiologist search latency by automatically retrieving and ranking the most clinically relevant prior imaging studies using explainable multi-factor scoring (0–100 scale), role-based access control (RBAC), and human-in-the-loop auditability.
 
@@ -30,28 +30,39 @@ For evaluation and testing, use the following pre-configured demo credentials:
 
 ## ⚡ Quick Start
 
-### 1. Launch Dev Servers from Root Directory
+### 1. Setup Python Virtual Environment (first time)
 ```powershell
-# Install dependencies from root directory
-npm install
-
-# Launch React UI dev server (Port 5173)
-npm run dev
-
-# Run FastAPI Backend (Port 8000)
-.\venv\Scripts\uvicorn backend.app.main:app --reload --port 8000
+python -m venv venv
+.\venv\Scripts\pip install -r backend\requirements.txt
 ```
 
-### 2. Run Automated Pytest Suite & Pilot Benchmark
+### 2. Launch the FastAPI Backend (Terminal 1)
 ```powershell
-# Run full 33-test acceptance suite
+# From the project root directory
+.\venv\Scripts\uvicorn backend.app.main:app --reload --port 8000
+```
+API available at `http://localhost:8000` · Swagger docs at `http://localhost:8000/docs`
+
+### 3. Launch the React Frontend (Terminal 2)
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+UI available at `http://localhost:5173`
+
+### 4. Run Automated Pytest Suite & Benchmark
+```powershell
+# Run full 42-test acceptance suite
 .\venv\Scripts\pytest backend/tests -v
 
-# Run pilot benchmark evaluation
+# Run pilot benchmark evaluation (measures 56% search time reduction)
 .\venv\Scripts\python scripts/run_benchmark.py
 ```
 
-Visit the workstation UI at `http://localhost:5173`.
+### 5. Authenticate
+Visit `http://localhost:5173` → the **Login page** loads first.  
+Use any demo account from the table above (e.g. `radiologist` / `Demo@123`).
 
 ---
 
@@ -60,7 +71,7 @@ Visit the workstation UI at `http://localhost:5173`.
 - **Primary KPI (Search Time Reduction)**: **56.0% Reduction in Search Time** (Baseline Median: `42.0s` $\rightarrow$ Assistant Median: `18.5s`).
 - **Top-1 Relevance Accuracy**: `100.0%`
 - **Top-3 Relevance Recall**: `100.0%`
-- **Pytest Acceptance Tests**: `33 / 33 Passed`
+- **Pytest Acceptance Tests**: `42 / 42 Passed`
 
 ---
 

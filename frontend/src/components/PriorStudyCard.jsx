@@ -1,108 +1,133 @@
 import React from 'react';
-import { CheckCircle2, AlertTriangle, XCircle, Info, Lock } from 'lucide-react';
+import { 
+  CheckCircle2, Sparkles, Building, Calendar, 
+  Clock, ShieldAlert, ChevronRight, Layers, Activity 
+} from 'lucide-react';
 
-export default function PriorStudyCard({ prior, onConfirm, onOverride, userRole }) {
-  const isTopRank = prior.rank === 1;
-  const score = Math.round(prior.score);
-  const isRadiologist = userRole === 'Radiologist';
+export const PriorStudyCard = ({ 
+  prior, 
+  isSelected, 
+  onSelect, 
+  onConfirm, 
+  onOverride 
+}) => {
+  const isTopMatch = prior.rank === 1;
+
+  // Subscores mapping
+  const subscores = [
+    { label: 'Anatomy', val: prior.scores.anatomy, color: 'bg-[#00D9FF]' },
+    { label: 'Modality', val: prior.scores.modality, color: 'bg-[#8B7CFF]' },
+    { label: 'Condition', val: prior.scores.condition, color: 'bg-emerald-400' },
+    { label: 'Report Context', val: prior.scores.reportContext, color: 'bg-[#00D9FF]' },
+    { label: 'Temporal', val: prior.scores.temporal, color: 'bg-[#FFB547]' }
+  ];
 
   return (
-    <div className={`prior-card ${isTopRank ? 'top-rank' : ''}`}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span className={`badge ${isTopRank ? 'badge-cyan' : 'badge-amber'}`} style={{ fontSize: '0.85rem' }}>
-            Rank #{prior.rank}
-          </span>
-          <span style={{ fontWeight: 700, fontSize: '1.05rem', color: isTopRank ? 'var(--accent-cyan)' : 'var(--text-primary)' }}>
-            Study #{prior.study_id}
-          </span>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>({prior.study_date})</span>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span className="badge badge-green" style={{ fontSize: '0.95rem', fontWeight: 700 }}>
-            {score} / 100 Match
-          </span>
-        </div>
-      </div>
-
-      {/* Relevance explanation tag when clinical relevance > recency */}
-      {prior.relevance_explanation_tag && (
-        <div style={{ background: 'rgba(6, 182, 212, 0.1)', border: '1px solid rgba(6, 182, 212, 0.3)', padding: '0.5rem 0.75rem', borderRadius: '0.375rem', color: 'var(--accent-cyan)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-          <Info size={14} style={{ minWidth: 14 }} />
-          <span>{prior.relevance_explanation_tag}</span>
+    <div
+      onClick={onSelect}
+      className={`relative rounded-2xl p-4 transition-all duration-200 cursor-pointer select-none ${
+        isSelected
+          ? isTopMatch
+            ? 'bg-[#0D131D] border-2 border-[#00D9FF] shadow-glow-cyan'
+            : 'bg-[#0D131D] border-2 border-violet-500/70 shadow-glow-violet'
+          : isTopMatch
+            ? 'bg-[#0D131D] border border-cyan-500/40 hover:border-[#00D9FF] shadow-panel'
+            : 'bg-[#0D131D]/80 border border-[#1D2A38] hover:border-slate-700 hover:bg-[#111927]'
+      }`}
+    >
+      {/* Top Match Visual Tag */}
+      {isTopMatch && (
+        <div className="absolute -top-2.5 left-5 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-[#00D9FF] to-[#8B7CFF] text-[#070B12] text-[9px] font-extrabold tracking-wider uppercase flex items-center gap-1 shadow-md">
+          <Sparkles className="w-2.5 h-2.5 fill-current" />
+          <span>Recommended Primary Prior</span>
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', fontSize: '0.8rem' }}>
-        <span className="badge badge-cyan">{prior.modality}</span>
-        <span className="badge badge-green">{prior.body_region}</span>
-        {prior.anatomy && <span className="badge badge-green">{prior.anatomy}</span>}
-        <span className="badge badge-amber">{prior.condition_concept}</span>
-      </div>
+      {/* Main Card Content */}
+      <div className="flex items-center justify-between gap-3">
+        
+        {/* Left: #1 CT Chest (matching wireframe) */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${
+              isTopMatch 
+                ? 'bg-cyan-500/20 text-[#00D9FF] border border-cyan-500/40' 
+                : 'bg-[#162234] text-slate-300 border border-[#1D2A38]'
+            }`}>
+              #{prior.rank}
+            </span>
 
-      {/* 0-100 Score Breakdown */}
-      {prior.score_breakdown && Object.keys(prior.score_breakdown).length > 0 && (
-        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.65rem', borderRadius: '0.375rem', border: '1px solid var(--border-color)' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--accent-cyan)', textTransform: 'uppercase', marginBottom: '0.4rem', letterSpacing: '0.05em' }}>
-            Score Breakdown (Total: {score} / 100):
+            <h3 className="text-base font-bold text-white tracking-tight truncate">
+              {prior.shortName || prior.studyName}
+            </h3>
+
+            <span className="text-[10px] font-mono text-slate-400">
+              ({prior.year || prior.date.split('-')[0]})
+            </span>
+
+            {isSelected && (
+              <span className="px-1.5 py-0.2 rounded bg-cyan-500/15 text-cyan-400 text-[9px] font-bold border border-cyan-500/30">
+                ACTIVE
+              </span>
+            )}
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.4rem', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-            {Object.entries(prior.score_breakdown).map(([k, v]) => (
-              <div key={k} style={{ display: 'flex', justifyContent: 'space-between', background: 'rgba(255,255,255,0.03)', padding: '0.2rem 0.4rem', borderRadius: '0.2rem' }}>
-                <span>{k}:</span>
-                <strong style={{ color: 'var(--text-primary)' }}>+{Math.round(v)}</strong>
-              </div>
-            ))}
+
+          <div className="flex items-center gap-3 text-[11px] text-slate-400 mt-1">
+            <span>{prior.date.split(' ')[0]}</span>
+            <span>•</span>
+            <span className="text-cyan-300 font-mono">{prior.interval}</span>
+            <span>•</span>
+            <span className="truncate max-w-[200px] text-slate-500">{prior.institution.split('-')[0]}</span>
           </div>
         </div>
-      )}
 
-      {/* Positive & Negative Signals */}
-      <div style={{ background: 'rgba(0,0,0,0.15)', padding: '0.65rem', borderRadius: '0.375rem', border: '1px solid var(--border-color)' }}>
-        <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.4rem' }}>
-          Positive & Negative Evidence Signals:
-        </div>
-        <ul className="evidence-list">
-          {prior.positive_signals?.map((ev, idx) => (
-            <li key={`pos-${idx}`} className="evidence-item" style={{ color: 'var(--text-secondary)' }}>
-              <CheckCircle2 size={13} style={{ color: 'var(--accent-green)', minWidth: 13 }} />
-              <span>{ev}</span>
-            </li>
-          ))}
-          {prior.negative_signals?.map((ev, idx) => (
-            <li key={`neg-${idx}`} className="evidence-item" style={{ color: 'var(--accent-amber)' }}>
-              <AlertTriangle size={13} style={{ color: 'var(--accent-amber)', minWidth: 13 }} />
-              <span>{ev}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Actions / Enforced RBAC Restrictions */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.5rem', marginTop: '0.25rem' }}>
-        {isRadiologist ? (
-          <>
-            <button 
-              className="btn btn-amber"
-              onClick={() => onOverride(prior)}
-            >
-              <XCircle size={15} /> Override
-            </button>
-
-            <button 
-              className="btn btn-green"
-              onClick={() => onConfirm(prior)}
-            >
-              <CheckCircle2 size={15} /> Confirm Comparison
-            </button>
-          </>
-        ) : (
-          <div className="badge badge-amber" style={{ padding: '0.45rem 0.85rem', fontSize: '0.8rem', gap: '0.4rem' }}>
-            <Lock size={14} /> Radiologist confirmation required
+        {/* Right: Exact Percentage Score (e.g. 92%, 87%, 61%) */}
+        <div className="flex items-center gap-3">
+          <div className="text-right">
+            <div className={`text-2xl sm:text-3xl font-extrabold font-mono tracking-tight ${
+              isTopMatch ? 'text-[#00D9FF]' : prior.matchScore >= 80 ? 'text-violet-300' : 'text-amber-400'
+            }`}>
+              {prior.matchScore}%
+            </div>
           </div>
-        )}
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelect();
+            }}
+            className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border ${
+              isSelected
+                ? 'bg-cyan-500 text-[#070B12] border-cyan-400 font-bold'
+                : 'bg-[#111927] hover:bg-[#162234] text-slate-300 border-[#1D2A38]'
+            }`}
+          >
+            {isSelected ? 'Active' : 'Select'}
+          </button>
+        </div>
+
       </div>
+
+      {/* 5 Similarity Sub-bars */}
+      <div className="mt-3 pt-2.5 border-t border-[#1D2A38] grid grid-cols-2 sm:grid-cols-5 gap-2">
+        {subscores.map((sub, idx) => (
+          <div key={idx} className="bg-[#090E17] p-1.5 rounded-lg border border-[#1D2A38]/60">
+            <div className="flex items-center justify-between text-[10px] mb-0.5">
+              <span className="text-slate-400">{sub.label}</span>
+              <span className="font-mono text-slate-200 font-semibold">{sub.val}%</span>
+            </div>
+            <div className="w-full bg-[#162234] h-1 rounded-full overflow-hidden">
+              <div 
+                className={`h-full rounded-full ${sub.color}`}
+                style={{ width: `${sub.val}%` }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
     </div>
   );
-}
+};
+
+export default PriorStudyCard;

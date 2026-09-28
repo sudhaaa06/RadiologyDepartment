@@ -1,0 +1,43 @@
+# Python virtual environment
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Node / Frontend
+frontend/node_modules/
+frontend/dist/
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# Data generated at runtime (keep structure, not generated outputs)
+data/audit_logs.json
+data/benchmark_results.json

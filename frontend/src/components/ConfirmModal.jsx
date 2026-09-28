@@ -1,7 +1,7 @@
 import React from 'react';
-import { ShieldAlert, CheckCircle2, X } from 'lucide-react';
+import { ShieldAlert, CheckCircle2, X, Clock } from 'lucide-react';
 
-export default function ConfirmModal({ prior, currentStudy, onClose, onConfirm }) {
+export default function ConfirmModal({ prior, currentStudy, durationSeconds = null, onClose, onConfirm }) {
   if (!prior || !currentStudy) return null;
 
   return (
@@ -28,6 +28,12 @@ export default function ConfirmModal({ prior, currentStudy, onClose, onConfirm }
             <div style={{ color: 'var(--text-primary)' }}>
               {prior.modality} • {prior.body_region} • {prior.condition_concept}
             </div>
+            {durationSeconds !== null && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.75rem', color: '#6ee7b7', marginTop: '0.2rem' }}>
+                <Clock size={13} />
+                <span>Time-to-Locate Measured: <strong>{durationSeconds.toFixed(1)}s</strong></span>
+              </div>
+            )}
           </div>
 
           <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.75rem', borderRadius: '0.375rem', border: '1px solid var(--border-color)' }}>
@@ -48,7 +54,7 @@ export default function ConfirmModal({ prior, currentStudy, onClose, onConfirm }
           <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '0.75rem', borderRadius: '0.375rem', color: 'var(--accent-amber)', fontSize: '0.8rem', display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
             <ShieldAlert size={16} style={{ minWidth: 16, marginTop: 2 }} />
             <span>
-              <strong>SAFETY BOUNDARY:</strong> This action does NOT represent a diagnosis, treatment recommendation, or clinical management decision. It strictly records historical study comparison relevance.
+              <strong>SAFETY BOUNDARY:</strong> Antigravity Assistant is strictly a prior-study retrieval and ranking assistant. It NEVER diagnoses, predicts disease, recommends treatment/surgery, or makes autonomous clinical decisions. Terminology used: "Suggested Prior Study", "Retrieval Match Score", "Supporting Evidence".
             </span>
           </div>
         </div>
@@ -57,11 +63,12 @@ export default function ConfirmModal({ prior, currentStudy, onClose, onConfirm }
           <button type="button" className="btn" onClick={onClose} style={{ background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)' }}>
             Cancel
           </button>
-          <button type="button" className="btn btn-green" onClick={onConfirm}>
-            <CheckCircle2 size={15} /> Confirm Comparison
+          <button type="button" className="btn btn-green" onClick={() => onConfirm(durationSeconds)}>
+            <CheckCircle2 size={15} /> Confirm Comparison ({durationSeconds ? `${durationSeconds.toFixed(1)}s` : 'OK'})
           </button>
         </div>
       </div>
     </div>
   );
 }
+

@@ -1,8 +1,9 @@
 import React from 'react';
-import { Activity, Clock, CheckCircle2, ShieldCheck, History, BarChart3, AlertTriangle, UserCheck } from 'lucide-react';
+import { Activity, Clock, CheckCircle2, ShieldCheck, BarChart3, AlertTriangle, UserCheck } from 'lucide-react';
 import HospitalLogoStrip from './HospitalLogoStrip.jsx';
+import WorklistStatsBar from './WorklistStatsBar.jsx';
 
-export default function DashboardView({ user, metrics, auditCount, edgeCasesCount = 33 }) {
+export default function DashboardView({ user, metrics, auditCount, edgeCasesCount = 33, studies = [], auditLogs = [] }) {
   const bTime = metrics?.baseline?.est_median_retrieval_time_seconds || 42.0;
   const aTime = metrics?.proposed_matching_assistant?.est_median_retrieval_time_seconds || 18.5;
   const improvement = Math.round(((bTime - aTime) / bTime) * 100);
@@ -40,6 +41,18 @@ export default function DashboardView({ user, metrics, auditCount, edgeCasesCoun
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ── Live Worklist Statistics ── */}
+      <div className="panel-card" style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <BarChart3 size={16} style={{ color: 'var(--accent-cyan)' }} />
+            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>Live Worklist Statistics</span>
+          </div>
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Computed from current worklist · Updates on page load</span>
+        </div>
+        <WorklistStatsBar studies={studies} auditLogs={auditLogs} metrics={metrics} />
       </div>
 
       {/* KPI Cards Grid */}

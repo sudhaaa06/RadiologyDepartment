@@ -1,60 +1,73 @@
 import React from 'react';
-import { Calendar, Building, Tag, FileText } from 'lucide-react';
+import { 
+  FileText, Calendar, Clock, MapPin, Maximize2, 
+  Layers, Activity, ShieldAlert, Sparkles 
+} from 'lucide-react';
+import DicomViewerPlaceholder from './DicomViewerPlaceholder.jsx';
 
-export default function CurrentStudyCard({ study }) {
-  if (!study) {
-    return (
-      <div className="panel-card">
-        <div className="panel-header">
-          <h3 className="panel-title">Current Active Study</h3>
-        </div>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Select a study from the worklist to view details.</p>
-      </div>
-    );
-  }
+export const CurrentStudyCard = ({ 
+  study, 
+  patient, 
+  onViewFullStudy 
+}) => {
+  if (!study) return null;
 
   return (
-    <div className="panel-card">
-      <div className="panel-header">
-        <h3 className="panel-title">Current Study #{study.study_id}</h3>
-        <span className="badge badge-cyan">{study.modality}</span>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.85rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
-          <span><Calendar size={14} inline /> Date: <strong>{study.study_date}</strong></span>
-          <span>Patient: <strong>{study.patient_id_hash}</strong></span>
+    <div className="bg-[#0D131D] border border-[#1D2A38] rounded-2xl p-4 lg:p-5 shadow-panel relative overflow-hidden transition-all duration-200">
+      
+      {/* Top Header Row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#1D2A38]">
+        <div>
+          <span className="text-[10px] font-mono tracking-widest text-[#00D9FF] font-bold uppercase block">
+            CURRENT STUDY
+          </span>
+          <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight mt-0.5 uppercase">
+            {study.name}
+          </h1>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <span className="badge badge-green">Region: {study.body_region}</span>
-          {study.anatomy && <span className="badge badge-green">Anatomy: {study.anatomy}</span>}
-          {study.laterality && study.laterality !== 'N/A' && (
-            <span className="badge badge-amber">Laterality: {study.laterality}</span>
-          )}
-        </div>
-
-        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.65rem', borderRadius: '0.375rem', border: '1px solid var(--border-color)' }}>
-          <div style={{ fontWeight: 600, color: 'var(--accent-cyan)', marginBottom: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <Tag size={14} /> Clinical Indication:
-          </div>
-          <p style={{ color: 'var(--text-primary)' }}>{study.clinical_indication}</p>
-        </div>
-
-        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.65rem', borderRadius: '0.375rem', border: '1px solid var(--border-color)' }}>
-          <div style={{ fontWeight: 600, color: 'var(--text-secondary)', marginBottom: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <Building size={14} /> Source & Department:
-          </div>
-          <p style={{ color: 'var(--text-primary)' }}>{study.source_centre} ({study.department || 'N/A'})</p>
-        </div>
-
-        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '0.65rem', borderRadius: '0.375rem', border: '1px solid var(--border-color)' }}>
-          <div style={{ fontWeight: 600, color: 'var(--accent-teal)', marginBottom: '0.2rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <FileText size={14} /> Impression / Report Context:
-          </div>
-          <p style={{ color: 'var(--text-primary)', fontStyle: 'italic' }}>"{study.report_summary}"</p>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-mono text-slate-400 bg-[#090E17] px-2.5 py-1 rounded-lg border border-[#1D2A38]">
+            {study.dateTime}
+          </span>
+          <button
+            onClick={onViewFullStudy}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#111927] hover:bg-[#162234] border border-[#1D2A38] hover:border-cyan-500/40 text-slate-200 hover:text-white text-xs font-semibold transition-all shadow-sm"
+          >
+            <Maximize2 className="w-3.5 h-3.5 text-[#00D9FF]" />
+            <span className="hidden sm:inline">Full Study</span>
+          </button>
         </div>
       </div>
+
+      {/* Clinical Metadata Bar */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 py-2.5 text-xs">
+        <div className="bg-[#090E17] p-2 rounded-xl border border-[#1D2A38]/70">
+          <span className="text-[10px] text-slate-500 uppercase font-semibold block">Anatomical Region</span>
+          <span className="font-semibold text-cyan-300 text-xs mt-0.5 block truncate">{study.anatomy}</span>
+        </div>
+        <div className="bg-[#090E17] p-2 rounded-xl border border-[#1D2A38]/70">
+          <span className="text-[10px] text-slate-500 uppercase font-semibold block">Modality / Protocol</span>
+          <span className="font-mono text-slate-200 text-xs mt-0.5 block">{study.modality} • 1.0mm Thin-slice</span>
+        </div>
+        <div className="bg-[#090E17] p-2 rounded-xl border border-[#1D2A38]/70 col-span-2 sm:col-span-1">
+          <span className="text-[10px] text-slate-500 uppercase font-semibold block">Contrast Agent</span>
+          <span className="font-mono text-slate-300 text-xs mt-0.5 block truncate" title={study.contrast}>{study.contrast}</span>
+        </div>
+      </div>
+
+      {/* Medical Scan Preview Placeholder */}
+      <div className="mt-1">
+        <DicomViewerPlaceholder 
+          study={study}
+          isPrior={false}
+          label="SCAN PREVIEW"
+          onExpand={onViewFullStudy}
+        />
+      </div>
+
     </div>
   );
-}
+};
+
+export default CurrentStudyCard;

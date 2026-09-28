@@ -1,353 +1,336 @@
-import React, { useState, useEffect } from 'react';
-import LoginPage from './components/LoginPage.jsx';
-import RegisterPage from './components/RegisterPage.jsx';
-import Header from './components/Header.jsx';
-import DashboardView from './components/DashboardView.jsx';
-import CurrentStudyCard from './components/CurrentStudyCard.jsx';
-import PriorStudyCard from './components/PriorStudyCard.jsx';
-import ConfirmModal from './components/ConfirmModal.jsx';
-import OverrideModal from './components/OverrideModal.jsx';
-import AuditLogTable from './components/AuditLogTable.jsx';
-import EvaluationPanel from './components/EvaluationPanel.jsx';
-import DemoModeSelector from './components/DemoModeSelector.jsx';
-import StakeholderValidationPanel from './components/StakeholderValidationPanel.jsx';
+import React, { useState, useMemo, useCallback } from "react";
+import Navbar from "./components/Navbar.jsx";
+import PatientCaseSidebar from "./components/PatientCaseSidebar.jsx";
+import CurrentStudyCard from "./components/CurrentStudyCard.jsx";
+import PriorStudyResults from "./components/PriorStudyResults.jsx";
+import WhyThisMatchEvidence from "./components/WhyThisMatchEvidence.jsx";
+import ClinicalTimelineSidebar from "./components/ClinicalTimelineSidebar.jsx";
+import FooterStatusBar from "./components/FooterStatusBar.jsx";
 
-import { fetchStudies, matchPriors, submitFeedback, fetchAuditLog, fetchPilotMetrics, logoutUser } from './api.js';
-import { Search, Layers, RefreshCw, AlertTriangle, ShieldCheck } from 'lucide-react';
+import ConfirmPriorModal from "./components/ConfirmPriorModal.jsx";
+import OverrideModal from "./components/OverrideModal.jsx";
+import FullStudyViewerModal from "./components/FullStudyViewerModal.jsx";
+import AuditTrailModal from "./components/AuditTrailModal.jsx";
+import SettingsModal from "./components/SettingsModal.jsx";
+
+import LoginPage from "./components/LoginPage.jsx";
+import RegisterPage from "./components/RegisterPage.jsx";
+import DashboardView from "./components/DashboardView.jsx";
+import OverrideAnalyticsView from "./components/OverrideAnalyticsView.jsx";
+import StakeholderValidationPanel from "./components/StakeholderValidationPanel.jsx";
+
+import { MOCK_PATIENT_CASES, INITIAL_AUDIT_LOG } from "./data/mockRadiologyData.js";
+import { CheckCircle2, AlertTriangle, Info, X } from "lucide-react";
+
+const SCREEN = { LOGIN: "login", REGISTER: "register", APP: "app" };
+const VIEW = { WORKSPACE: "workspace", DASHBOARD: "dashboard", ANALYTICS: "analytics", VALIDATION: "validation" };
 
 export default function App() {
-  const [currentUser, setCurrentUser] = useState(() => {
-    const saved = localStorage.getItem('pacs_user_session');
-    return saved ? JSON.parse(saved) : null;
+  const [screen, setScreen] = useState(SCREEN.LOGIN);
+  const [user, setUser] = useState(null);
+  const [activeView, setActiveView] = useState(VIEW.WORKSPACE);
+
+  const [allCases] = useState(MOCK_PATIENT_CASES);
+  const [currentCaseId, setCurrentCaseId] = useState("case-1");
+  const currentCase = useMemo(
+    () => allCases.find((c) => c.id === currentCaseId) || allCases[0],
+    [allCases, currentCaseId]
+  );
+
+  const [selectedPriorId, setSelectedPriorId] = useState("prior-101");
+
+  const [filters, setFilters] = useState({
+    anatomy: "ALL", modality: "ALL", dateRange: "ALL", institution: "ALL", minScore: 0,
   });
 
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [studies, setStudies] = useState([]);
-  const [selectedStudy, setSelectedStudy] = useState(null);
-  const [matchData, setMatchData] = useState(null);
-  const [auditLogs, setAuditLogs] = useState([]);
-  const [metrics, setMetrics] = useState(null);
-  
-  const [loading, setLoading] = useState(false);
-  const [confirmTarget, setConfirmTarget] = useState(null);
-  const [overrideTarget, setOverrideTarget] = useState(null);
-  const [statusMessage, setStatusMessage] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [activePreset, setActivePreset] = useState(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isOverrideModalOpen, setIsOverrideModalOpen] = useState(false);
+  const [isFullViewerOpen, setIsFullViewerOpen] = useState(false);
+  const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  useEffect(() => {
-    if (currentUser) {
-      loadWorklist();
-      loadAuditTrail();
-      loadMetrics();
+  const [auditLogs, setAuditLogs] = useState(INITIAL_AUDIT_LOG);
+  const [toast, setToast] = useState(null);
+
+  const showToast = useCallback((message, type = "success") => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 4500);
+  }, []);
+
+  const handleLoginSuccess = useCallback((sessionData) => {
+    setUser(sessionData);
+    setScreen(SCREEN.APP);
+    setActiveView(VIEW.DASHBOARD);
+    showToast("Welcome, " + (sessionData.display_name || sessionData.username) + "!", "success");
+  }, [showToast]);
+
+  const handleLogout = useCallback(() => {
+    setUser(null);
+    setScreen(SCREEN.LOGIN);
+    setActiveView(VIEW.WORKSPACE);
+  }, []);
+
+  const handleSelectCase = useCallback((newCase) => {
+    setCurrentCaseId(newCase.id);
+    if (newCase.priorStudies && newCase.priorStudies.length > 0) {
+      setSelectedPriorId(newCase.priorStudies[0].id);
+    } else {
+      setSelectedPriorId(null);
     }
-  }, [currentUser]);
+    setActiveView(VIEW.WORKSPACE);
+    showToast("Loaded Patient Case: " + newCase.patientName + " (" + newCase.patientId + ")", "info");
+  }, [showToast]);
 
-  const handleLoginSuccess = (userData) => {
-    setCurrentUser(userData);
-    localStorage.setItem('pacs_user_session', JSON.stringify(userData));
-    setActiveTab('dashboard');
-  };
+  const handleUpdateFilters = useCallback((key, value) =>
+    setFilters((prev) => ({ ...prev, [key]: value })), []);
 
-  const handleLogout = async () => {
-    if (currentUser?.token) {
-      try {
-        await logoutUser(currentUser.token);
-      } catch (err) {
-        console.error(err);
+  const handleResetFilters = useCallback(() => {
+    setFilters({ anatomy: "ALL", modality: "ALL", dateRange: "ALL", institution: "ALL", minScore: 0 });
+    showToast("Filters reset to default", "info");
+  }, [showToast]);
+
+  const filteredPriors = useMemo(() => {
+    if (!currentCase || !currentCase.priorStudies) return [];
+    return currentCase.priorStudies.filter((p) => {
+      if (filters.modality !== "ALL") {
+        if (!p.studyName.toUpperCase().includes(filters.modality)) return false;
       }
-    }
-    localStorage.removeItem('pacs_user_session');
-    setCurrentUser(null);
-  };
-
-  const loadWorklist = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchStudies();
-      setStudies(data);
-      if (data.length > 0 && !selectedStudy) {
-        handleSelectStudy(data[0]);
+      if (p.matchScore < filters.minScore) return false;
+      if (filters.anatomy !== "ALL") {
+        const title = p.studyName.toUpperCase();
+        if (filters.anatomy === "CHEST" && !title.includes("CHEST")) return false;
+        if (filters.anatomy === "SPINE" && !title.includes("SPINE") && !title.includes("CERVICAL")) return false;
+        if (filters.anatomy === "ABDOMEN" && !title.includes("ABDOMEN") && !title.includes("PELVIS")) return false;
       }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return true;
+    });
+  }, [currentCase, filters]);
 
-  const loadAuditTrail = async () => {
-    try {
-      const data = await fetchAuditLog();
-      setAuditLogs(data.entries || []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const activePrior = useMemo(() => {
+    if (!currentCase || !currentCase.priorStudies || currentCase.priorStudies.length === 0) return null;
+    return currentCase.priorStudies.find((p) => p.id === selectedPriorId) || currentCase.priorStudies[0];
+  }, [currentCase, selectedPriorId]);
 
-  const loadMetrics = async () => {
-    try {
-      const data = await fetchPilotMetrics();
-      setMetrics(data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const handleConfirmPrior = useCallback((data) => {
+    const newLog = {
+      id: "aud-" + Date.now().toString().slice(-4),
+      timestamp: new Date().toLocaleTimeString("en-US", { hour12: false }) + " EST",
+      user: data.signature || (user && user.display_name) || "Dr. Elena Vance, MD",
+      action: "CONFIRMED_PRIOR",
+      caseId: currentCase.id,
+      patientId: currentCase.patientId,
+      currentStudyId: currentCase.currentStudy.studyId,
+      selectedPriorId: data.priorId,
+      priorName: data.priorName,
+      matchScore: data.matchScore,
+      reason: data.notes || "Human radiologist verified clinical match relevance.",
+      attestation: data.attestation,
+    };
+    setAuditLogs((prev) => [newLog, ...prev]);
+    setIsConfirmModalOpen(false);
+    showToast("Prior Study Confirmed & Signed: " + data.priorName, "success");
+  }, [currentCase, user, showToast]);
 
-  const handleSelectStudy = async (study) => {
-    setSelectedStudy(study);
-    setLoading(true);
-    try {
-      const result = await matchPriors(study);
-      setMatchData(result);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleOverrideSubmit = useCallback((data) => {
+    const newLog = {
+      id: "aud-" + Date.now().toString().slice(-4),
+      timestamp: new Date().toLocaleTimeString("en-US", { hour12: false }) + " EST",
+      user: data.user || (user && user.display_name) || "Dr. Elena Vance, MD",
+      action: "OVERRIDE_MATCH",
+      caseId: currentCase.id,
+      patientId: currentCase.patientId,
+      currentStudyId: currentCase.currentStudy.studyId,
+      selectedPriorId: data.priorId,
+      priorName: data.priorName,
+      matchScore: activePrior ? activePrior.matchScore : 0,
+      reason: "OVERRIDE_REASON: " + data.reason + ". " + data.detailedNotes,
+      attestation: "Physician recorded clinical override.",
+    };
+    setAuditLogs((prev) => [newLog, ...prev]);
+    if (data.alternativePriorId) setSelectedPriorId(data.alternativePriorId);
+    setIsOverrideModalOpen(false);
+    showToast("Match Overridden: Reason \"" + data.reason + "\" recorded in audit trail", "warning");
+  }, [currentCase, user, activePrior, showToast]);
 
-  const handlePresetSelect = (presetId) => {
-    setActivePreset(presetId);
-    let targetId = null;
-
-    if (presetId === 'journey1_stat_brain') targetId = 'ST_JOURNEY1_STAT';
-    else if (presetId === 'journey2_routine_knee') targetId = 'ST_JOURNEY2_ROUTINE';
-    else if (presetId === 'external_centre_chest') targetId = 'ST_EC6_Q';
-    else if (presetId === 'missing_metadata') targetId = 'ST_EC5_Q';
-    else if (presetId === 'no_priors_available') targetId = 'ST_EC9_Q';
-
-    if (targetId) {
-      const found = studies.find(s => s.study_id === targetId);
-      if (found) {
-        handleSelectStudy(found);
-      } else {
-        fetchStudies().then(all => {
-          const f = all.find(s => s.study_id === targetId);
-          if (f) handleSelectStudy(f);
-        });
-      }
-    }
-    setActiveTab('workstation');
-  };
-
-  const handleConfirmSubmit = async () => {
-    if (!confirmTarget || !selectedStudy) return;
-    try {
-      await submitFeedback({
-        study_id: selectedStudy.study_id,
-        recommended_prior_id: confirmTarget.study_id,
-        human_decision: 'CONFIRMED',
-        user_role: currentUser?.role || 'Radiologist'
-      });
-      setStatusMessage(`✅ Comparison confirmed with Prior Study #${confirmTarget.study_id}`);
-      setConfirmTarget(null);
-      loadAuditTrail();
-      setTimeout(() => setStatusMessage(null), 4000);
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  const handleOverrideSubmit = async (reasonPayload) => {
-    if (!overrideTarget || !selectedStudy) return;
-    try {
-      await submitFeedback({
-        study_id: selectedStudy.study_id,
-        recommended_prior_id: overrideTarget.study_id,
-        human_decision: 'OVERRIDDEN',
-        override_reason: reasonPayload.override_reason,
-        custom_reason_text: reasonPayload.custom_reason_text,
-        user_role: currentUser?.role || 'Radiologist'
-      });
-      setStatusMessage(`⚠️ Override recorded for Study #${overrideTarget.study_id} (Reason: ${reasonPayload.override_reason})`);
-      setOverrideTarget(null);
-      loadAuditTrail();
-      setTimeout(() => setStatusMessage(null), 4000);
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  const [authView, setAuthView] = useState('login'); // 'login' | 'register'
-
-  if (!currentUser) {
-    if (authView === 'register') {
-      return (
-        <RegisterPage
-          onLoginSuccess={handleLoginSuccess}
-          onSwitchToLogin={() => setAuthView('login')}
-        />
-      );
-    }
+  // -- Auth screens ----------------------------------------------------------
+  if (screen === SCREEN.LOGIN) {
     return (
       <LoginPage
         onLoginSuccess={handleLoginSuccess}
-        onSwitchToRegister={() => setAuthView('register')}
+        onSwitchToRegister={() => setScreen(SCREEN.REGISTER)}
       />
     );
   }
 
-  const filteredStudies = studies.filter(s => 
-    s.study_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.patient_id_hash.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.modality.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.body_region.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (s.urgency && s.urgency.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  if (screen === SCREEN.REGISTER) {
+    return (
+      <RegisterPage
+        onLoginSuccess={handleLoginSuccess}
+        onSwitchToLogin={() => setScreen(SCREEN.LOGIN)}
+      />
+    );
+  }
 
+  // -- Authenticated app -----------------------------------------------------
   return (
-    <div className="app-container">
-      <Header 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        user={currentUser} 
-        onLogout={handleLogout} 
+    <div className="min-h-screen bg-[#070B12] text-slate-100 flex flex-col font-sans pb-16">
+
+      <Navbar
+        user={user}
+        activeView={activeView}
+        onSetView={setActiveView}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        onOpenAuditLog={() => setIsAuditModalOpen(true)}
+        onLogout={handleLogout}
+        auditCount={auditLogs.length}
+        allCases={allCases}
+        currentCase={currentCase}
+        onSelectCase={handleSelectCase}
       />
 
-      <main className="main-content">
-        {statusMessage && (
-          <div className="badge badge-cyan" style={{ padding: '0.75rem 1.25rem', fontSize: '0.9rem', width: '100%', marginBottom: '1rem', justifyContent: 'space-between' }}>
-            <span>{statusMessage}</span>
-            <button onClick={() => setStatusMessage(null)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer' }}>✕</button>
+      {toast && (
+        <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 animate-bounce">
+          <div className={"px-4 py-2 rounded-2xl border text-xs font-semibold flex items-center gap-2.5 shadow-2xl backdrop-blur-md " + (
+            toast.type === "success"
+              ? "bg-emerald-950/90 border-emerald-500/50 text-emerald-200"
+              : toast.type === "warning"
+              ? "bg-amber-950/90 border-amber-500/50 text-amber-200"
+              : "bg-cyan-950/90 border-cyan-500/50 text-cyan-200"
+          )}>
+            {toast.type === "success" ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            ) : toast.type === "warning" ? (
+              <AlertTriangle className="w-4 h-4 text-amber-400" />
+            ) : (
+              <Info className="w-4 h-4 text-cyan-400" />
+            )}
+            <span>{toast.message}</span>
+            <button onClick={() => setToast(null)} className="ml-2 hover:opacity-80">
+              <X className="w-3.5 h-3.5" />
+            </button>
           </div>
-        )}
+        </div>
+      )}
 
-        {activeTab === 'dashboard' && (
-          <DashboardView 
-            user={currentUser} 
-            metrics={metrics} 
-            auditCount={auditLogs.length} 
-            edgeCasesCount={33}
+      {activeView === VIEW.DASHBOARD && (
+        <main className="flex-1 w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6">
+          <DashboardView
+            user={user}
+            auditCount={auditLogs.length}
+            studies={allCases.flatMap((c) => c.priorStudies || [])}
+            auditLogs={auditLogs}
           />
-        )}
+        </main>
+      )}
 
-        {activeTab === 'workstation' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', width: '100%' }}>
-            {/* Demo Mode Preset Switcher */}
-            <DemoModeSelector activePreset={activePreset} onSelectPreset={handlePresetSelect} />
+      {activeView === VIEW.ANALYTICS && (
+        <main className="flex-1 w-full max-w-[1200px] mx-auto px-4 lg:px-8 py-6">
+          <OverrideAnalyticsView />
+        </main>
+      )}
 
-            <div className="workstation-grid">
-              {/* Column 1: Incoming Worklist */}
-              <div className="panel-card">
-                <div className="panel-header">
-                  <h3 className="panel-title"><Layers size={18} /> Incoming Scans ({filteredStudies.length})</h3>
-                  <button onClick={loadWorklist} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                    <RefreshCw size={16} />
-                  </button>
-                </div>
+      {activeView === VIEW.VALIDATION && (
+        <main className="flex-1 w-full max-w-[900px] mx-auto px-4 lg:px-8 py-6">
+          <StakeholderValidationPanel user={user} />
+        </main>
+      )}
 
-                <div style={{ position: 'relative' }}>
-                  <Search size={14} style={{ position: 'absolute', left: 10, top: 12, color: 'var(--text-muted)' }} />
-                  <input 
-                    type="text"
-                    className="form-input"
-                    style={{ width: '100%', paddingLeft: '2rem' }}
-                    placeholder="Search ID, Patient, Modality, STAT..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
+      {activeView === VIEW.WORKSPACE && (
+        <main className="flex-1 w-full max-w-[1920px] mx-auto px-3 sm:px-4 lg:px-6 py-4 flex flex-col lg:flex-row gap-4">
+          <PatientCaseSidebar
+            allCases={allCases}
+            currentCase={currentCase}
+            onSelectCase={handleSelectCase}
+            filters={filters}
+            onUpdateFilters={handleUpdateFilters}
+            onResetFilters={handleResetFilters}
+          />
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: 'calc(100vh - 340px)', overflowY: 'auto' }}>
-                  {filteredStudies.map((st) => (
-                    <div 
-                      key={st.study_id}
-                      className={`worklist-item ${selectedStudy?.study_id === st.study_id ? 'selected' : ''}`}
-                      onClick={() => handleSelectStudy(st)}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.2rem' }}>
-                        <span style={{ fontWeight: 700, color: 'var(--accent-cyan)' }}>#{st.study_id}</span>
-                        <div style={{ display: 'flex', gap: '0.3rem' }}>
-                          {st.urgency === 'STAT' && <span className="badge badge-rose" style={{ fontSize: '0.65rem' }}>STAT</span>}
-                          <span className="badge badge-cyan" style={{ fontSize: '0.7rem' }}>{st.modality}</span>
-                        </div>
-                      </div>
-                      <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', justifyContent: 'space-between' }}>
-                        <span>Patient: {st.patient_id_hash}</span>
-                        <span>{st.study_date}</span>
-                      </div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.2rem', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
-                        {st.clinical_indication}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          <div className="flex-1 flex flex-col gap-4 min-w-0">
+            <CurrentStudyCard
+              study={currentCase.currentStudy}
+              patient={currentCase}
+              onViewFullStudy={() => setIsFullViewerOpen(true)}
+            />
 
-              {/* Column 2: Current Study View */}
-              <CurrentStudyCard study={selectedStudy} />
+            <PriorStudyResults
+              priorStudies={filteredPriors}
+              selectedPriorId={selectedPriorId}
+              onSelectPrior={setSelectedPriorId}
+              onConfirmPrior={(prior) => {
+                setSelectedPriorId(prior.id);
+                setIsConfirmModalOpen(true);
+              }}
+              onOverridePrior={(prior) => {
+                setSelectedPriorId(prior.id);
+                setIsOverrideModalOpen(true);
+              }}
+            />
 
-              {/* Column 3: Recommended Priors */}
-              <div className="panel-card">
-                <div className="panel-header">
-                  <h3 className="panel-title">
-                    Suggested Prior Studies
-                  </h3>
-                  {matchData?.recommendations && (
-                    <span className="badge badge-green">{matchData.recommendations.length} Candidate Priors</span>
-                  )}
-                </div>
-
-                {loading ? (
-                  <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
-                    Calculating multi-factor match scores & normalized evidence...
-                  </div>
-                ) : matchData?.low_confidence_warning ? (
-                  <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '1rem', borderRadius: '0.375rem', color: 'var(--accent-amber)', fontSize: '0.85rem' }}>
-                    <AlertTriangle size={16} inline /> <strong>Low Confidence Warning:</strong> {matchData.warning_message}
-                  </div>
-                ) : matchData?.recommendations?.length === 0 ? (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No historical prior studies retrieved for this patient.</p>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: 'calc(100vh - 340px)', overflowY: 'auto' }}>
-                    {matchData?.recommendations?.map((prior) => (
-                      <PriorStudyCard 
-                        key={prior.study_id}
-                        prior={prior}
-                        userRole={currentUser?.role}
-                        onConfirm={(p) => setConfirmTarget(p)}
-                        onOverride={(p) => setOverrideTarget(p)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
+            {activePrior && (
+              <WhyThisMatchEvidence
+                activePrior={activePrior}
+                currentStudy={currentCase.currentStudy}
+                onConfirmPrior={() => setIsConfirmModalOpen(true)}
+                onOverrideMatch={() => setIsOverrideModalOpen(true)}
+                onViewFullStudy={() => setIsFullViewerOpen(true)}
+              />
+            )}
           </div>
-        )}
 
-        {activeTab === 'audit' && (
-          <AuditLogTable auditLogs={auditLogs} />
-        )}
+          <ClinicalTimelineSidebar
+            priorStudies={currentCase.priorStudies}
+            selectedPriorId={selectedPriorId}
+            onSelectPrior={setSelectedPriorId}
+            changeOverTime={currentCase.changeOverTime}
+          />
+        </main>
+      )}
 
-        {activeTab === 'evaluation' && (
-          <EvaluationPanel metrics={metrics} />
-        )}
-
-        {activeTab === 'validation' && (
-          <StakeholderValidationPanel user={currentUser} />
-        )}
-      </main>
-
-      {/* Confirmation Dialog Modal */}
-      {confirmTarget && (
-        <ConfirmModal 
-          prior={confirmTarget}
-          currentStudy={selectedStudy}
-          onClose={() => setConfirmTarget(null)}
-          onConfirm={handleConfirmSubmit}
+      {activeView === VIEW.WORKSPACE && (
+        <FooterStatusBar
+          auditCount={auditLogs.length}
+          onOpenAuditTrail={() => setIsAuditModalOpen(true)}
+          timeToLocate="1.8s"
         />
       )}
 
-      {/* Override Dialog Modal */}
-      {overrideTarget && (
-        <OverrideModal 
-          prior={overrideTarget}
-          onClose={() => setOverrideTarget(null)}
-          onSubmit={handleOverrideSubmit}
-        />
-      )}
+      <ConfirmPriorModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        prior={activePrior}
+        currentStudy={currentCase.currentStudy}
+        patient={currentCase}
+        onConfirm={handleConfirmPrior}
+      />
+
+      <OverrideModal
+        isOpen={isOverrideModalOpen}
+        onClose={() => setIsOverrideModalOpen(false)}
+        prior={activePrior}
+        allPriors={currentCase.priorStudies}
+        patient={currentCase}
+        onOverrideSubmit={handleOverrideSubmit}
+      />
+
+      <FullStudyViewerModal
+        isOpen={isFullViewerOpen}
+        onClose={() => setIsFullViewerOpen(false)}
+        currentStudy={currentCase.currentStudy}
+        priorStudy={activePrior}
+        patient={currentCase}
+      />
+
+      <AuditTrailModal
+        isOpen={isAuditModalOpen}
+        onClose={() => setIsAuditModalOpen(false)}
+        auditLogs={auditLogs}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+      />
     </div>
   );
 }

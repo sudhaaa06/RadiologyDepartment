@@ -1,9 +1,9 @@
 {
   "status": "Pilot benchmark completed on synthetic/de-identified data",
   "dataset_overview": {
-    "total_studies": 176,
-    "total_test_cases": 126,
-    "patient_histories": 37,
+    "total_studies": 282,
+    "total_test_cases": 202,
+    "patient_histories": 60,
     "modalities": [
       "CT",
       "MRI",
@@ -19,14 +19,14 @@
   },
   "primary_kpi": {
     "metric_name": "Time to locate most clinically relevant prior study",
-    "baseline_median_seconds": 42.0,
+    "baseline_median_seconds": 42.2,
     "target_median_seconds": 30.0,
     "assistant_median_seconds": 18.5,
-    "absolute_improvement_seconds": 23.5,
-    "percentage_improvement": "56.0% reduction in search time"
+    "absolute_improvement_seconds": 23.7,
+    "percentage_improvement": "56.2% reduction in search time"
   },
   "secondary_kpis": {
-    "baseline_top1_accuracy_pct": 100.0,
+    "baseline_top1_accuracy_pct": 99.5,
     "baseline_top3_recall_pct": 100.0,
     "assistant_top1_accuracy_pct": 100.0,
     "assistant_top3_recall_pct": 100.0,
@@ -34,7 +34,7 @@
     "mean_candidates_reviewed_assistant": 1.1,
     "override_rate_pct": 0.0,
     "false_match_rate_pct": 0.0,
-    "no_prior_found_cases": 13
+    "no_prior_found_cases": 21
   },
   "error_analysis_summary": {
     "Terminology mismatch": 0,

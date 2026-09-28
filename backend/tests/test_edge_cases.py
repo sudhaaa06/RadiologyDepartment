@@ -284,5 +284,42 @@ def test_edge_case_no_prior_study_available():
     resp = engine.match_priors(query, [query]) # No priors in pool for this patient
     assert len(resp.recommendations) == 0
     assert resp.low_confidence_warning is True
+    assert resp.no_prior_found is True
     assert "No historical prior studies available" in resp.warning_message
+
+def test_edge_case_10_contrast_protocol_mismatch():
+    query = RadiologyStudy(
+        study_id="ST_EC10_Q",
+        patient_id_hash="PAT_EC10",
+        study_date="2026-03-01",
+        modality="CT",
+        body_region="Abdomen",
+        anatomy="Liver",
+        clinical_indication="Hepatic mass characterization triple phase",
+        condition_concept="Liver Lesion",
+        report_summary="Arterial enhancing liver lesion",
+        exam_type="CT Abdomen With Contrast",
+        contrast_used=True
+    )
+    prior_non_contrast = RadiologyStudy(
+        study_id="ST_EC10_P",
+        patient_id_hash="PAT_EC10",
+        study_date="2025-06-01",
+        modality="CT",
+        body_region="Abdomen",
+        anatomy="Liver",
+        clinical_indication="Abdominal pain workup",
+        condition_concept="Liver Lesion",
+        report_summary="Non-contrast scan, lesion poorly visualized",
+        exam_type="CT Abdomen Without Contrast",
+        contrast_used=False
+    )
+    resp = engine.match_priors(query, [query, prior_non_contrast])
+    assert len(resp.recommendations) == 1
+    rec = resp.recommendations[0]
+    # Check that negative signal for contrast protocol mismatch is present
+    has_contrast_signal = any("Contrast protocol mismatch" in sig for sig in rec.negative_signals)
+    print(f"Edge Case 10 - Expected: Contrast mismatch flagged | Actual: {has_contrast_signal} | PASS")
+    assert has_contrast_signal
+
 

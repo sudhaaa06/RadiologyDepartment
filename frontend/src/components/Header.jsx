@@ -1,7 +1,7 @@
 import React from 'react';
-import { Activity, ShieldAlert, LayoutDashboard, FileSearch, History, BarChart3, UserCheck, LogOut, Star } from 'lucide-react';
+import { ShieldAlert, LayoutDashboard, FileSearch, History, BarChart3, UserCheck, Star } from 'lucide-react';
 
-export default function Header({ activeTab, setActiveTab, user, onLogout }) {
+export default function Header({ activeTab, setActiveTab, user, onRoleChange }) {
   const getRoleBadgeClass = (role) => {
     if (role === 'Radiologist') return 'badge-cyan';
     if (role === 'Technician') return 'badge-amber';
@@ -11,10 +11,30 @@ export default function Header({ activeTab, setActiveTab, user, onLogout }) {
   return (
     <header>
       <div className="app-header">
-        <div className="brand-title">
-          <Activity size={24} style={{ color: '#06b6d4' }} />
-          <span>Prior-Study Matching Assistant</span>
-          <span className="brand-badge">Radiology AI Assistant</span>
+        <div className="brand-title" style={{ gap: '0.6rem' }}>
+          {/* Radiology Center Logo */}
+          <img
+            src="/radiology_logo.jpg"
+            alt="Radiology Center"
+            style={{
+              height: '48px',
+              width: 'auto',
+              borderRadius: '6px',
+              objectFit: 'contain',
+              background: '#fff',
+              padding: '3px 6px',
+              imageRendering: 'high-quality',
+              filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.35))',
+            }}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+            <span style={{ fontWeight: 700, fontSize: '0.95rem', letterSpacing: '-0.01em', color: 'var(--text-primary)' }}>
+              Prior-Study Matching Assistant
+            </span>
+            <span className="brand-badge" style={{ alignSelf: 'flex-start', fontSize: '0.6rem' }}>
+              Radiology AI Assistant
+            </span>
+          </div>
         </div>
 
         <nav className="nav-tabs">
@@ -60,13 +80,27 @@ export default function Header({ activeTab, setActiveTab, user, onLogout }) {
               </span>
             </div>
 
-            <button 
-              className="btn btn-amber"
-              style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}
-              onClick={onLogout}
-            >
-              <LogOut size={13} /> Logout
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Role:</span>
+              <select 
+                value={user.role} 
+                onChange={(e) => onRoleChange && onRoleChange(e.target.value)}
+                style={{
+                  background: 'var(--bg-card)',
+                  color: 'var(--text-main)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '6px',
+                  padding: '0.3rem 0.6rem',
+                  fontSize: '0.75rem',
+                  cursor: 'pointer',
+                  fontWeight: 500
+                }}
+              >
+                <option value="Radiologist">Radiologist (MD)</option>
+                <option value="Technician">Technician (RT)</option>
+                <option value="Admin">Admin</option>
+              </select>
+            </div>
           </div>
         )}
       </div>
