@@ -22,9 +22,21 @@ from app.services.audit_service import AuditService
 from app.services.auth_service import auth_service
 from app.services.normalization import TerminologyNormalizer
 from app.services.report_scanner import ReportScanner
+from app.services.telemetry_service import telemetry_service
 
 router = APIRouter(prefix="/api")
 matching_engine = ExplainableMatchingEngine()
+
+class TelemetryEventRequest(BaseModel):
+    task_id: str = Field(..., description="Unique task ID")
+    session_id: str = Field(..., description="User session ID")
+    case_id_hash: str = Field(..., description="De-identified patient/case hash")
+    workflow_type: str = Field(..., description="'baseline' or 'assistant'")
+    event_type: str = Field(..., description="Lifecycle event type")
+    selected_prior_study: Optional[str] = None
+    override_status: Optional[str] = None
+    details: Optional[Dict[str, Any]] = None
+    timestamp: Optional[str] = None
 
 class ClientAuditEvent(BaseModel):
     action: str = Field(..., description="One of the 14 audit actions")
@@ -327,6 +339,63 @@ def normalize_terminology(req: NormalizationRequest):
         condition_normalized=cond_mapped,
         records=records
     )
+
+@router.post("/telemetry/event")
+def record_telemetry_event(req: TelemetryEventRequest):
+    """Record lifecycle events for Time-To-Locate measurement across Baseline and Assistant."""
+    evt = telemetry_service.record_event(
+        task_id=req.task_id,
+        session_id=req.session_id,
+        case_id_hash=req.case_id_hash,
+        workflow_type=req.workflow_type,
+        event_type=req.event_type,
+        selected_prior_study=req.selected_prior_study,
+        override_status=req.override_status,
+        details=req.details,
+        timestamp=req.timestamp
+    )
+    return {"status": "success", "event_id": evt.event_id}
+
+@router.get("/telemetry/summary")
+def get_telemetry_summary():
+    """Retrieve summary metrics for time-to-locate telemetry."""
+    return telemetry_service.get_summary()
+
+@router.get("/telemetry/tasks")
+def list_telemetry_tasks(workflow_type: Optional[str] = Query(None)):
+    """List recorded task records with timestamps and time-to-locate values."""
+    return [t.model_dump() for t in telemetry_service.list_tasks(workflow_type=workflow_type)]
+
+@router.get("/experiment/cases")
+def get_experiment_cases():
+    """Return the curated 48-case empirical evaluation test suite."""
+    cases_path = Path(__file__).parent.parent.parent.parent / "data" / "evaluation_cases.json"
+    if not cases_path.exists():
+        raise HTTPException(status_code=404, detail="Evaluation cases not found")
+    with open(cases_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+@router.get("/experiment/results")
+def get_experiment_results():
+    """Return the comprehensive empirical experiment results (Baseline vs Assistant)."""
+    results_path = Path(__file__).parent.parent.parent.parent / "data" / "experiment_results.json"
+    if not results_path.exists():
+        return {"status": "PENDING", "message": "Experiment pending"}
+    try:
+        with open(results_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception as e:
+        return {"status": "ERROR", "message": str(e)}
+
+@router.post("/experiment/run")
+def trigger_experiment():
+    """Execute the empirical benchmark experiment across all evaluation cases."""
+    import subprocess
+    script_path = Path(__file__).parent.parent.parent.parent / "scripts" / "run_experiment.py"
+    res = subprocess.run([sys.executable, str(script_path)], capture_output=True, text=True)
+    if res.returncode != 0:
+        raise HTTPException(status_code=500, detail=f"Experiment runner failed: {res.stderr}")
+    return get_experiment_results()
 
 @router.get("/evaluation/results")
 def get_evaluation_results():

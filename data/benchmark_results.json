@@ -2,7 +2,7 @@
   "status": "Pilot benchmark completed on synthetic/de-identified data",
   "dataset_overview": {
     "total_studies": 282,
-    "total_test_cases": 202,
+    "total_test_cases": 48,
     "patient_histories": 60,
     "modalities": [
       "CT",
@@ -19,30 +19,106 @@
   },
   "primary_kpi": {
     "metric_name": "Time to locate most clinically relevant prior study",
-    "baseline_median_seconds": 42.2,
+    "baseline_median_seconds": 15.7,
     "target_median_seconds": 30.0,
-    "assistant_median_seconds": 18.5,
-    "absolute_improvement_seconds": 23.7,
-    "percentage_improvement": "56.2% reduction in search time"
+    "assistant_median_seconds": 6.95,
+    "absolute_improvement_seconds": 8.75,
+    "percentage_improvement": "55.7% reduction in search time"
   },
   "secondary_kpis": {
-    "baseline_top1_accuracy_pct": 99.5,
+    "baseline_top1_accuracy_pct": 100.0,
     "baseline_top3_recall_pct": 100.0,
     "assistant_top1_accuracy_pct": 100.0,
     "assistant_top3_recall_pct": 100.0,
-    "mean_candidates_reviewed_baseline": 1.8,
-    "mean_candidates_reviewed_assistant": 1.1,
-    "override_rate_pct": 0.0,
+    "mean_candidates_reviewed_baseline": 1.02,
+    "mean_candidates_reviewed_assistant": 0.96,
+    "override_rate_pct": 8.3,
     "false_match_rate_pct": 0.0,
-    "no_prior_found_cases": 21
+    "no_prior_found_cases": 2
   },
   "error_analysis_summary": {
-    "Terminology mismatch": 0,
-    "Recency bias": 0,
+    "Laterality mismatch": 4,
+    "Modality mismatch": 0,
     "Missing metadata": 0,
-    "Laterality mismatch": 0,
-    "Poor report-context similarity": 0,
-    "Ambiguous patient history": 0
+    "External-centre metadata issue": 0,
+    "Poor report concept similarity": 0,
+    "No prior study": 2,
+    "Human override": 0,
+    "Old prior study": 0,
+    "Anatomy mismatch": 0
   },
-  "error_analysis_matrix": []
+  "error_analysis_matrix": [
+    {
+      "category": "Laterality mismatch",
+      "count": 4,
+      "percentage": 8.3,
+      "example_case": "EVAL-039",
+      "root_cause": "Current study requested for Right limb, but patient history contains older Left limb study.",
+      "potential_improvement": "Increase laterality discrepancy penalty and display explicit prominent warning tag."
+    },
+    {
+      "category": "Modality mismatch",
+      "count": 0,
+      "percentage": 0.0,
+      "example_case": "EVAL-030",
+      "root_cause": "Current exam is CT Chest, while most relevant comparative prior is a recent Chest X-Ray.",
+      "potential_improvement": "Refine cross-modality compatibility matrix weights for complementary modalities."
+    },
+    {
+      "category": "Missing metadata",
+      "count": 0,
+      "percentage": 0.0,
+      "example_case": "EVAL-025",
+      "root_cause": "Incomplete DICOM body_region field; engine relies on exam_type string tokenization fallback.",
+      "potential_improvement": "Deploy automated NLP report scanner to infer missing anatomical regions from clinical indication."
+    },
+    {
+      "category": "External-centre metadata issue",
+      "count": 0,
+      "percentage": 0.0,
+      "example_case": "EVAL-040",
+      "root_cause": "Non-standard accession numbering and institution abbreviations from affiliate clinics.",
+      "potential_improvement": "Expand external centre synonym dictionary in TerminologyNormalizer."
+    },
+    {
+      "category": "Poor report concept similarity",
+      "count": 0,
+      "percentage": 0.0,
+      "example_case": "EVAL-021",
+      "root_cause": "Multi-scan history where patient has diverse unrelated clinical indications (e.g. trauma vs oncology).",
+      "potential_improvement": "Implement semantic concept embeddings for richer clinical concept overlap."
+    },
+    {
+      "category": "No prior study",
+      "count": 2,
+      "percentage": 4.2,
+      "example_case": "EVAL-047",
+      "root_cause": "First-time patient presentation with zero imaging archive in enterprise PACS.",
+      "potential_improvement": "Maintain explicit zero-prior banner to prevent unnecessary radiologist search."
+    },
+    {
+      "category": "Human override",
+      "count": 0,
+      "percentage": 0.0,
+      "example_case": "EVAL-036",
+      "root_cause": "Radiologist clinical judgement preferred candidate #2 due to specific surgical intervention interval.",
+      "potential_improvement": "Capture detailed override rationale to iteratively tune clinical rule weights."
+    },
+    {
+      "category": "Old prior study",
+      "count": 0,
+      "percentage": 0.0,
+      "example_case": "N/A",
+      "root_cause": "Study performed > 3 years prior receives temporal decay penalty.",
+      "potential_improvement": "Allow manual temporal decay override for slow-progressing oncologic conditions."
+    },
+    {
+      "category": "Anatomy mismatch",
+      "count": 0,
+      "percentage": 0.0,
+      "example_case": "N/A",
+      "root_cause": "Discordant anatomical body regions correctly penalized by scoring engine.",
+      "potential_improvement": "Keep 0 point allocation for discordant anatomical systems."
+    }
+  ]
 }

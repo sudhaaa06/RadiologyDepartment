@@ -1,0 +1,683 @@
+[
+  {
+    "case_id": "EVAL-001",
+    "category": "Routine",
+    "difficulty": "Standard",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST_DEMO1_CHEST_QUERY",
+    "patient_id_hash": "PAT_DEMO_CHEST",
+    "ground_truth_prior_ids": [
+      "ST_DEMO1_EXT_PRIOR"
+    ],
+    "expected_challenges": "Standard recency & condition matching for surveillance",
+    "description": "Routine follow-up: CT Chest Without Contrast for Pulmonary Nodule"
+  },
+  {
+    "case_id": "EVAL-002",
+    "category": "Routine",
+    "difficulty": "Standard",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST_JOURNEY2_ROUTINE",
+    "patient_id_hash": "PAT_ROUTINE_KNEE",
+    "ground_truth_prior_ids": [
+      "ST_JOURNEY2_PRIOR_HUMAN_PICK"
+    ],
+    "expected_challenges": "Standard recency & condition matching for surveillance",
+    "description": "Routine follow-up: MRI Knee Right Without Contrast for Fracture Follow-up"
+  },
+  {
+    "case_id": "EVAL-003",
+    "category": "Routine",
+    "difficulty": "Standard",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1006",
+    "patient_id_hash": "PAT_0002X",
+    "ground_truth_prior_ids": [
+      "ST1007",
+      "ST1008",
+      "ST1009",
+      "ST1010",
+      "ST1011"
+    ],
+    "expected_challenges": "Standard recency & condition matching for surveillance",
+    "description": "Routine follow-up: MRI Spine Without Contrast for Degenerative Spine Disease"
+  },
+  {
+    "case_id": "EVAL-004",
+    "category": "Routine",
+    "difficulty": "Standard",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1008",
+    "patient_id_hash": "PAT_0002X",
+    "ground_truth_prior_ids": [
+      "ST1009",
+      "ST1010",
+      "ST1011"
+    ],
+    "expected_challenges": "Standard recency & condition matching for surveillance",
+    "description": "Routine follow-up: X-Ray Spine With Contrast for Degenerative Spine Disease"
+  },
+  {
+    "case_id": "EVAL-005",
+    "category": "Routine",
+    "difficulty": "Standard",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1009",
+    "patient_id_hash": "PAT_0002X",
+    "ground_truth_prior_ids": [
+      "ST1010",
+      "ST1011"
+    ],
+    "expected_challenges": "Standard recency & condition matching for surveillance",
+    "description": "Routine follow-up: X-Ray Spine With Contrast for Degenerative Spine Disease"
+  },
+  {
+    "case_id": "EVAL-006",
+    "category": "Routine",
+    "difficulty": "Standard",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1014",
+    "patient_id_hash": "PAT_0003X",
+    "ground_truth_prior_ids": [
+      "ST1015",
+      "ST1016"
+    ],
+    "expected_challenges": "Standard recency & condition matching for surveillance",
+    "description": "Routine follow-up: CT Chest Without Contrast for Pulmonary Nodule"
+  },
+  {
+    "case_id": "EVAL-007",
+    "category": "Routine",
+    "difficulty": "Standard",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1015",
+    "patient_id_hash": "PAT_0003X",
+    "ground_truth_prior_ids": [
+      "ST1016"
+    ],
+    "expected_challenges": "Standard recency & condition matching for surveillance",
+    "description": "Routine follow-up: CT Chest Without Contrast for Pulmonary Nodule"
+  },
+  {
+    "case_id": "EVAL-008",
+    "category": "Routine",
+    "difficulty": "Standard",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1021",
+    "patient_id_hash": "PAT_0005X",
+    "ground_truth_prior_ids": [
+      "ST1022",
+      "ST1023",
+      "ST1024",
+      "ST1025"
+    ],
+    "expected_challenges": "Standard recency & condition matching for surveillance",
+    "description": "Routine follow-up: CT Chest Without Contrast for Pulmonary Nodule"
+  },
+  {
+    "case_id": "EVAL-009",
+    "category": "Routine",
+    "difficulty": "Standard",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1024",
+    "patient_id_hash": "PAT_0005X",
+    "ground_truth_prior_ids": [
+      "ST1025"
+    ],
+    "expected_challenges": "Standard recency & condition matching for surveillance",
+    "description": "Routine follow-up: X-Ray Chest With Contrast for Pulmonary Nodule"
+  },
+  {
+    "case_id": "EVAL-010",
+    "category": "Routine",
+    "difficulty": "Standard",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1027",
+    "patient_id_hash": "PAT_0006X",
+    "ground_truth_prior_ids": [
+      "ST1028",
+      "ST1029",
+      "ST1030"
+    ],
+    "expected_challenges": "Standard recency & condition matching for surveillance",
+    "description": "Routine follow-up: X-Ray Chest Without Contrast for Pulmonary Nodule"
+  },
+  {
+    "case_id": "EVAL-011",
+    "category": "Urgent",
+    "difficulty": "High",
+    "urgency": "STAT",
+    "query_study_id": "ST_JOURNEY1_STAT",
+    "patient_id_hash": "PAT_STAT_BRAIN",
+    "ground_truth_prior_ids": [
+      "ST_JOURNEY1_PRIOR_BEST"
+    ],
+    "expected_challenges": "Time-critical prior retrieval; high penalty for latency",
+    "description": "STAT exam: CT Brain Without Contrast for Stroke Follow-up"
+  },
+  {
+    "case_id": "EVAL-012",
+    "category": "Urgent",
+    "difficulty": "Standard",
+    "urgency": "URGENT",
+    "query_study_id": "ST1000",
+    "patient_id_hash": "PAT_0001X",
+    "ground_truth_prior_ids": [
+      "ST1001",
+      "ST1002",
+      "ST1003",
+      "ST1004",
+      "ST1005"
+    ],
+    "expected_challenges": "Time-critical prior retrieval; high penalty for latency",
+    "description": "URGENT exam: CT Chest Without Contrast for Pulmonary Nodule"
+  },
+  {
+    "case_id": "EVAL-013",
+    "category": "Urgent",
+    "difficulty": "High",
+    "urgency": "STAT",
+    "query_study_id": "ST1001",
+    "patient_id_hash": "PAT_0001X",
+    "ground_truth_prior_ids": [
+      "ST1002",
+      "ST1003",
+      "ST1004",
+      "ST1005"
+    ],
+    "expected_challenges": "Time-critical prior retrieval; high penalty for latency",
+    "description": "STAT exam: CT Chest Without Contrast for Pulmonary Nodule"
+  },
+  {
+    "case_id": "EVAL-014",
+    "category": "Urgent",
+    "difficulty": "Standard",
+    "urgency": "URGENT",
+    "query_study_id": "ST1002",
+    "patient_id_hash": "PAT_0001X",
+    "ground_truth_prior_ids": [
+      "ST1003",
+      "ST1004",
+      "ST1005"
+    ],
+    "expected_challenges": "Time-critical prior retrieval; high penalty for latency",
+    "description": "URGENT exam: CT Chest With Contrast for Pulmonary Nodule"
+  },
+  {
+    "case_id": "EVAL-015",
+    "category": "Urgent",
+    "difficulty": "High",
+    "urgency": "STAT",
+    "query_study_id": "ST1003",
+    "patient_id_hash": "PAT_0001X",
+    "ground_truth_prior_ids": [
+      "ST1004",
+      "ST1005"
+    ],
+    "expected_challenges": "Time-critical prior retrieval; high penalty for latency",
+    "description": "STAT exam: X-Ray Chest Without Contrast for Pulmonary Nodule"
+  },
+  {
+    "case_id": "EVAL-016",
+    "category": "Urgent",
+    "difficulty": "High",
+    "urgency": "STAT",
+    "query_study_id": "ST1004",
+    "patient_id_hash": "PAT_0001X",
+    "ground_truth_prior_ids": [
+      "ST1005"
+    ],
+    "expected_challenges": "Time-critical prior retrieval; high penalty for latency",
+    "description": "STAT exam: CT Chest With Contrast for Pulmonary Nodule"
+  },
+  {
+    "case_id": "EVAL-017",
+    "category": "Urgent",
+    "difficulty": "Standard",
+    "urgency": "URGENT",
+    "query_study_id": "ST1007",
+    "patient_id_hash": "PAT_0002X",
+    "ground_truth_prior_ids": [
+      "ST1008",
+      "ST1009",
+      "ST1010",
+      "ST1011"
+    ],
+    "expected_challenges": "Time-critical prior retrieval; high penalty for latency",
+    "description": "URGENT exam: CT Spine Without Contrast for Degenerative Spine Disease"
+  },
+  {
+    "case_id": "EVAL-018",
+    "category": "Urgent",
+    "difficulty": "High",
+    "urgency": "STAT",
+    "query_study_id": "ST1010",
+    "patient_id_hash": "PAT_0002X",
+    "ground_truth_prior_ids": [
+      "ST1011"
+    ],
+    "expected_challenges": "Time-critical prior retrieval; high penalty for latency",
+    "description": "STAT exam: CT Spine With Contrast for Degenerative Spine Disease"
+  },
+  {
+    "case_id": "EVAL-019",
+    "category": "Urgent",
+    "difficulty": "High",
+    "urgency": "STAT",
+    "query_study_id": "ST1012",
+    "patient_id_hash": "PAT_0003X",
+    "ground_truth_prior_ids": [
+      "ST1013",
+      "ST1014",
+      "ST1015",
+      "ST1016"
+    ],
+    "expected_challenges": "Time-critical prior retrieval; high penalty for latency",
+    "description": "STAT exam: CT Chest Without Contrast for Pulmonary Nodule"
+  },
+  {
+    "case_id": "EVAL-020",
+    "category": "Urgent",
+    "difficulty": "Standard",
+    "urgency": "URGENT",
+    "query_study_id": "ST1013",
+    "patient_id_hash": "PAT_0003X",
+    "ground_truth_prior_ids": [
+      "ST1014",
+      "ST1015",
+      "ST1016"
+    ],
+    "expected_challenges": "Time-critical prior retrieval; high penalty for latency",
+    "description": "URGENT exam: X-Ray Chest With Contrast for Pulmonary Nodule"
+  },
+  {
+    "case_id": "EVAL-021",
+    "category": "Difficult",
+    "difficulty": "High",
+    "urgency": "STAT",
+    "query_study_id": "ST1017",
+    "patient_id_hash": "PAT_0004X",
+    "ground_truth_prior_ids": [
+      "ST1018",
+      "ST1019"
+    ],
+    "expected_challenges": "Disentangling true baseline across 4 prior imaging sessions",
+    "description": "Multi-scan complex history (4 exams on file): CT Spine Without Contrast"
+  },
+  {
+    "case_id": "EVAL-022",
+    "category": "Difficult",
+    "difficulty": "High",
+    "urgency": "STAT",
+    "query_study_id": "ST1018",
+    "patient_id_hash": "PAT_0004X",
+    "ground_truth_prior_ids": [
+      "ST1019"
+    ],
+    "expected_challenges": "Disentangling true baseline across 4 prior imaging sessions",
+    "description": "Multi-scan complex history (4 exams on file): Ultrasound Spine With Contrast"
+  },
+  {
+    "case_id": "EVAL-023",
+    "category": "Difficult",
+    "difficulty": "High",
+    "urgency": "STAT",
+    "query_study_id": "ST1022",
+    "patient_id_hash": "PAT_0005X",
+    "ground_truth_prior_ids": [
+      "ST1023",
+      "ST1024",
+      "ST1025"
+    ],
+    "expected_challenges": "Disentangling true baseline across 6 prior imaging sessions",
+    "description": "Multi-scan complex history (6 exams on file): X-Ray Chest Without Contrast"
+  },
+  {
+    "case_id": "EVAL-024",
+    "category": "Difficult",
+    "difficulty": "High",
+    "urgency": "STAT",
+    "query_study_id": "ST1023",
+    "patient_id_hash": "PAT_0005X",
+    "ground_truth_prior_ids": [
+      "ST1024",
+      "ST1025"
+    ],
+    "expected_challenges": "Disentangling true baseline across 6 prior imaging sessions",
+    "description": "Multi-scan complex history (6 exams on file): CT Chest With Contrast"
+  },
+  {
+    "case_id": "EVAL-025",
+    "category": "Difficult",
+    "difficulty": "High",
+    "urgency": "URGENT",
+    "query_study_id": "ST1028",
+    "patient_id_hash": "PAT_0006X",
+    "ground_truth_prior_ids": [
+      "ST1029",
+      "ST1030"
+    ],
+    "expected_challenges": "Disentangling true baseline across 5 prior imaging sessions",
+    "description": "Multi-scan complex history (5 exams on file): CT Chest Without Contrast"
+  },
+  {
+    "case_id": "EVAL-026",
+    "category": "Difficult",
+    "difficulty": "High",
+    "urgency": "URGENT",
+    "query_study_id": "ST1029",
+    "patient_id_hash": "PAT_0006X",
+    "ground_truth_prior_ids": [
+      "ST1030"
+    ],
+    "expected_challenges": "Disentangling true baseline across 5 prior imaging sessions",
+    "description": "Multi-scan complex history (5 exams on file): CT Chest Without Contrast"
+  },
+  {
+    "case_id": "EVAL-027",
+    "category": "Difficult",
+    "difficulty": "High",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1032",
+    "patient_id_hash": "PAT_0007X",
+    "ground_truth_prior_ids": [
+      "ST1033",
+      "ST1034"
+    ],
+    "expected_challenges": "Disentangling true baseline across 4 prior imaging sessions",
+    "description": "Multi-scan complex history (4 exams on file): CT Chest With Contrast"
+  },
+  {
+    "case_id": "EVAL-028",
+    "category": "Difficult",
+    "difficulty": "High",
+    "urgency": "STAT",
+    "query_study_id": "ST1033",
+    "patient_id_hash": "PAT_0007X",
+    "ground_truth_prior_ids": [
+      "ST1034"
+    ],
+    "expected_challenges": "Disentangling true baseline across 4 prior imaging sessions",
+    "description": "Multi-scan complex history (4 exams on file): CT Chest Without Contrast"
+  },
+  {
+    "case_id": "EVAL-029",
+    "category": "Missing Metadata",
+    "difficulty": "Moderate",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1032",
+    "patient_id_hash": "PAT_0007X",
+    "ground_truth_prior_ids": [
+      "ST1033",
+      "ST1034"
+    ],
+    "expected_challenges": "Incomplete header; fallback to exam_type normalization required",
+    "description": "Missing anatomy/region metadata: CT Chest With Contrast fallback test"
+  },
+  {
+    "case_id": "EVAL-030",
+    "category": "Missing Metadata",
+    "difficulty": "Moderate",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1038",
+    "patient_id_hash": "PAT_0008X",
+    "ground_truth_prior_ids": [
+      "ST1039"
+    ],
+    "expected_challenges": "Incomplete header; fallback to exam_type normalization required",
+    "description": "Missing anatomy/region metadata: MRI Brain Without Contrast fallback test"
+  },
+  {
+    "case_id": "EVAL-031",
+    "category": "Missing Metadata",
+    "difficulty": "Moderate",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1051",
+    "patient_id_hash": "PAT_0011X",
+    "ground_truth_prior_ids": [
+      "ST1052",
+      "ST1053",
+      "ST1054"
+    ],
+    "expected_challenges": "Incomplete header; fallback to exam_type normalization required",
+    "description": "Missing anatomy/region metadata: CT Abdomen Without Contrast fallback test"
+  },
+  {
+    "case_id": "EVAL-032",
+    "category": "Missing Metadata",
+    "difficulty": "Moderate",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1052",
+    "patient_id_hash": "PAT_0011X",
+    "ground_truth_prior_ids": [
+      "ST1053",
+      "ST1054"
+    ],
+    "expected_challenges": "Incomplete header; fallback to exam_type normalization required",
+    "description": "Missing anatomy/region metadata: X-Ray Abdomen Without Contrast fallback test"
+  },
+  {
+    "case_id": "EVAL-033",
+    "category": "Missing Metadata",
+    "difficulty": "Moderate",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1056",
+    "patient_id_hash": "PAT_0012X",
+    "ground_truth_prior_ids": [
+      "ST1057",
+      "ST1058"
+    ],
+    "expected_challenges": "Incomplete header; fallback to exam_type normalization required",
+    "description": "Missing anatomy/region metadata: CT Abdomen Without Contrast fallback test"
+  },
+  {
+    "case_id": "EVAL-034",
+    "category": "Different Modality",
+    "difficulty": "Moderate",
+    "urgency": "STAT",
+    "query_study_id": "ST1036",
+    "patient_id_hash": "PAT_0008X",
+    "ground_truth_prior_ids": [
+      "ST1037",
+      "ST1038",
+      "ST1039"
+    ],
+    "expected_challenges": "Cross-modality comparison (e.g. CT vs CXR or MRI vs CT); baseline filter fails",
+    "description": "Cross-modality retrieval: Query MRI vs Prior cross-modality"
+  },
+  {
+    "case_id": "EVAL-035",
+    "category": "Different Modality",
+    "difficulty": "Moderate",
+    "urgency": "STAT",
+    "query_study_id": "ST1037",
+    "patient_id_hash": "PAT_0008X",
+    "ground_truth_prior_ids": [
+      "ST1038",
+      "ST1039"
+    ],
+    "expected_challenges": "Cross-modality comparison (e.g. CT vs CXR or MRI vs CT); baseline filter fails",
+    "description": "Cross-modality retrieval: Query CAT Scan vs Prior cross-modality"
+  },
+  {
+    "case_id": "EVAL-036",
+    "category": "Different Modality",
+    "difficulty": "Moderate",
+    "urgency": "URGENT",
+    "query_study_id": "ST1040",
+    "patient_id_hash": "PAT_0009X",
+    "ground_truth_prior_ids": [
+      "ST1041",
+      "ST1042",
+      "ST1043",
+      "ST1044"
+    ],
+    "expected_challenges": "Cross-modality comparison (e.g. CT vs CXR or MRI vs CT); baseline filter fails",
+    "description": "Cross-modality retrieval: Query Radiograph vs Prior cross-modality"
+  },
+  {
+    "case_id": "EVAL-037",
+    "category": "Different Modality",
+    "difficulty": "Moderate",
+    "urgency": "STAT",
+    "query_study_id": "ST1041",
+    "patient_id_hash": "PAT_0009X",
+    "ground_truth_prior_ids": [
+      "ST1042",
+      "ST1043",
+      "ST1044"
+    ],
+    "expected_challenges": "Cross-modality comparison (e.g. CT vs CXR or MRI vs CT); baseline filter fails",
+    "description": "Cross-modality retrieval: Query CAT Scan vs Prior cross-modality"
+  },
+  {
+    "case_id": "EVAL-038",
+    "category": "Different Modality",
+    "difficulty": "Moderate",
+    "urgency": "URGENT",
+    "query_study_id": "ST1042",
+    "patient_id_hash": "PAT_0009X",
+    "ground_truth_prior_ids": [
+      "ST1043",
+      "ST1044"
+    ],
+    "expected_challenges": "Cross-modality comparison (e.g. CT vs CXR or MRI vs CT); baseline filter fails",
+    "description": "Cross-modality retrieval: Query CAT Scan vs Prior cross-modality"
+  },
+  {
+    "case_id": "EVAL-039",
+    "category": "Laterality Mismatch",
+    "difficulty": "High",
+    "urgency": "STAT",
+    "query_study_id": "ST1074",
+    "patient_id_hash": "PAT_0016X",
+    "ground_truth_prior_ids": [
+      "ST1075",
+      "ST1076",
+      "ST1077"
+    ],
+    "expected_challenges": "Laterality verification (Right); penalty applied if opposite limb",
+    "description": "Laterality check: Right Knee Joint examination"
+  },
+  {
+    "case_id": "EVAL-040",
+    "category": "Laterality Mismatch",
+    "difficulty": "High",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1109",
+    "patient_id_hash": "PAT_0023X",
+    "ground_truth_prior_ids": [
+      "ST1110",
+      "ST1111",
+      "ST1112"
+    ],
+    "expected_challenges": "Laterality verification (Right); penalty applied if opposite limb",
+    "description": "Laterality check: Right Knee Joint examination"
+  },
+  {
+    "case_id": "EVAL-041",
+    "category": "Laterality Mismatch",
+    "difficulty": "High",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST1111",
+    "patient_id_hash": "PAT_0023X",
+    "ground_truth_prior_ids": [
+      "ST1112"
+    ],
+    "expected_challenges": "Laterality verification (Right); penalty applied if opposite limb",
+    "description": "Laterality check: Right Knee Joint examination"
+  },
+  {
+    "case_id": "EVAL-042",
+    "category": "Laterality Mismatch",
+    "difficulty": "High",
+    "urgency": "STAT",
+    "query_study_id": "ST1143",
+    "patient_id_hash": "PAT_0030X",
+    "ground_truth_prior_ids": [
+      "ST1144"
+    ],
+    "expected_challenges": "Laterality verification (Left); penalty applied if opposite limb",
+    "description": "Laterality check: Left Knee Joint examination"
+  },
+  {
+    "case_id": "EVAL-043",
+    "category": "External Centre",
+    "difficulty": "Moderate",
+    "urgency": "STAT",
+    "query_study_id": "ST1043",
+    "patient_id_hash": "PAT_0009X",
+    "ground_truth_prior_ids": [
+      "ST1044"
+    ],
+    "expected_challenges": "External nomenclature & accession formatting from Regional General Hospital",
+    "description": "External transfer from Regional General Hospital: X-Ray Abdomen Without Contrast"
+  },
+  {
+    "case_id": "EVAL-044",
+    "category": "External Centre",
+    "difficulty": "Moderate",
+    "urgency": "STAT",
+    "query_study_id": "ST1045",
+    "patient_id_hash": "PAT_0010X",
+    "ground_truth_prior_ids": [
+      "ST1046",
+      "ST1047",
+      "ST1048",
+      "ST1049"
+    ],
+    "expected_challenges": "External nomenclature & accession formatting from Regional General Hospital",
+    "description": "External transfer from Regional General Hospital: CT Abdomen Without Contrast"
+  },
+  {
+    "case_id": "EVAL-045",
+    "category": "External Centre",
+    "difficulty": "Moderate",
+    "urgency": "URGENT",
+    "query_study_id": "ST1046",
+    "patient_id_hash": "PAT_0010X",
+    "ground_truth_prior_ids": [
+      "ST1047",
+      "ST1048",
+      "ST1049"
+    ],
+    "expected_challenges": "External nomenclature & accession formatting from St. Jude Community Clinic",
+    "description": "External transfer from St. Jude Community Clinic: CT Abdomen Without Contrast"
+  },
+  {
+    "case_id": "EVAL-046",
+    "category": "External Centre",
+    "difficulty": "Moderate",
+    "urgency": "STAT",
+    "query_study_id": "ST1047",
+    "patient_id_hash": "PAT_0010X",
+    "ground_truth_prior_ids": [
+      "ST1048",
+      "ST1049"
+    ],
+    "expected_challenges": "External nomenclature & accession formatting from Metro Outpatient Imaging",
+    "description": "External transfer from Metro Outpatient Imaging: CT Abdomen Without Contrast"
+  },
+  {
+    "case_id": "EVAL-047",
+    "category": "No Prior",
+    "difficulty": "Standard",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST_DEMO1_EXT_PRIOR",
+    "patient_id_hash": "PAT_DEMO_CHEST",
+    "ground_truth_prior_ids": [],
+    "expected_challenges": "First-time patient; system must gracefully declare 'No prior study on record'",
+    "description": "Initial presentation (no historical priors): CT Thorax Non-Contrast"
+  },
+  {
+    "case_id": "EVAL-048",
+    "category": "No Prior",
+    "difficulty": "Standard",
+    "urgency": "ROUTINE",
+    "query_study_id": "ST_DEMO1_NOISE_PRIOR",
+    "patient_id_hash": "PAT_DEMO_CHEST",
+    "ground_truth_prior_ids": [],
+    "expected_challenges": "First-time patient; system must gracefully declare 'No prior study on record'",
+    "description": "Initial presentation (no historical priors): Chest Radiograph PA/LAT"
+  }
+]
